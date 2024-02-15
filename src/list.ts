@@ -1,5 +1,6 @@
 import { v4 as uuidV4 } from "uuid"
 
+
 type Task = {
     id: string
     title: string
@@ -14,7 +15,8 @@ export default function Items(){
     const list = document.querySelector<HTMLUListElement>('#list');
     const form = document.querySelector<HTMLFormElement>('#new-task-form');
     const input = document.querySelector<HTMLInputElement>('#new-task-title');
-    const tasks: Task[] = loadTasks()
+    const removeAll = document.querySelector<HTMLButtonElement>('#remove-all-tasks');
+    let tasks: Task[] = loadTasks()
     tasks.forEach(addListItem)
 
     form?.addEventListener('submit', e => {
@@ -34,22 +36,58 @@ export default function Items(){
         input.value = ""
     })
 
-    function addListItem(task: Task) {
+    removeAll?.addEventListener('click',e =>{
+        e.preventDefault()
+
+        if(list?.innerHTML==''|| list?.innerHTML == null) return
+
+        tasks = []
+        saveTasks()
+        list.innerHTML= "";
+    })
+
+    function addListItem(task: Task):void {
+    
         const item = document.createElement("li")
+        item.classList.add("list-group-item","d-flex","justify-content-between");
+
         const label = document.createElement("label")
+        label.classList.add("form-check-label","fs-4","text-capitalize")
+        label.htmlFor="checkBox"
+
         const checkbox = document.createElement("input")
+        checkbox.classList.add("form-check-input","me-3","p-3")
+        checkbox.id="checkBox"
+        checkbox.type = "checkbox"
+
+        const removeBtn = document.createElement("button")
+        removeBtn.classList.add("btn", "btn-outline-danger","text-center","font-weight-bold","px-2");
+
+        const div = document.createElement("div")
+        div.classList.add("me-3")
+        
+        
+        
         checkbox.addEventListener("change", () => {
           task.completed = checkbox.checked
+          checkbox.checked ? label.classList.add("text-decoration-line-through") : label.classList.remove("text-decoration-line-through")
             saveTasks()
         })
-        checkbox.type = "checkbox"
+
+        removeBtn.addEventListener("click",()=>{
+            
+        })
+        
         checkbox.checked = task.completed
-        label.append(checkbox, task.title)
-        item.append(label)
+        checkbox.checked ? label.classList.add("text-decoration-line-through") : label.classList.remove("text-decoration-line-through")
+        removeBtn.append("X")
+        label.append( `${task.title}`)
+        div.append(checkbox, label)
+        item.append(div,removeBtn)
         list?.append(item)
     }
 
-    function saveTasks() {
+    function saveTasks():void {
         localStorage.setItem('Tasks',JSON.stringify(tasks))
     }
     function loadTasks():Task[]{
