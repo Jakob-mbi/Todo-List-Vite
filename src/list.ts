@@ -47,7 +47,7 @@ export default function Items(){
     })
 
     function addListItem(task: Task):void {
-    
+
         const item = document.createElement("li")
         item.classList.add("list-group-item","d-flex","justify-content-between");
 
@@ -74,8 +74,16 @@ export default function Items(){
             saveTasks()
         })
 
+        const itemId:string = task.id;
         removeBtn.addEventListener("click",()=>{
-            
+            const newArray:Task[] = tasks.filter((item)=>{if(item.id!=itemId){return item}})
+            tasks =[];
+            tasks = newArray;
+            saveTasks();
+
+            if(list?.innerHTML==''|| list?.innerHTML == null) return
+            list.innerHTML= "";
+            tasks.forEach(addListItem)
         })
         
         checkbox.checked = task.completed
