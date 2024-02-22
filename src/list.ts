@@ -1,13 +1,5 @@
 import { v4 as uuidV4 } from "uuid"
-
-
-type Task = {
-    id: string
-    title: string
-    completed: boolean
-    createdAt: Date
-}
-
+import { saveTasks,type Task,loadTasks} from "./util";
 
 
 export default function Items(){
@@ -17,7 +9,14 @@ export default function Items(){
     const input = document.querySelector<HTMLInputElement>('#new-task-title');
     const removeAll = document.querySelector<HTMLButtonElement>('#remove-all-tasks');
     let tasks: Task[] = loadTasks()
+    
     tasks.forEach(addListItem)
+
+     //timeDateFormat
+     const timeDateFormat = new Intl.DateTimeFormat("sv",{
+        timeStyle: "short",
+        dateStyle: "short",
+    })
 
     form?.addEventListener('submit', e => {
         e.preventDefault()
@@ -28,10 +27,10 @@ export default function Items(){
             id: uuidV4(),
             title: input.value,
             completed: false,
-            createdAt: new Date()
+            createdAt: timeDateFormat.format(new Date())
         }
         tasks.push(newTask)
-        saveTasks()
+        saveTasks(tasks)
         addListItem(newTask)
         input.value = ""
     })
@@ -42,66 +41,102 @@ export default function Items(){
         if(list?.innerHTML==''|| list?.innerHTML == null) return
 
         tasks = []
-        saveTasks()
+        saveTasks(tasks)
         list.innerHTML= "";
     })
 
     function addListItem(task: Task):void {
 
+        //item
+        const itemId:string = task.id;
         const item = document.createElement("li")
         item.classList.add("list-group-item","d-flex","justify-content-between");
 
+        //label
         const label = document.createElement("label")
-        label.classList.add("form-check-label","fs-4","text-capitalize")
+        label.classList.add("form-check-label","fs-2","text-capitalize")
         label.htmlFor="checkBox"
 
+        
+        //timeDateFormat
+        const timeDateFormat = new Intl.DateTimeFormat("sv",{
+            timeStyle: "short",
+            dateStyle: "short",
+        })
+        
+        // start
+        const start = document.createElement("span")
+        start.classList.add("me-2","fs-6","flex-nowrap")
+        const startTime = task.createdAt
+        start.innerHTML = "Start: "+ startTime;
+
+        // finish
+
+        const finish = document.createElement("span")
+        finish.classList.add("fs-5","flex-nowrap")
+
+        
+        //checkbox
         const checkbox = document.createElement("input")
         checkbox.classList.add("form-check-input","me-3","p-3")
         checkbox.id="checkBox"
         checkbox.type = "checkbox"
 
+        //removeBtn
         const removeBtn = document.createElement("button")
         removeBtn.classList.add("btn", "btn-outline-danger","text-center","font-weight-bold","px-2");
 
+        //edit
+        const edit = document.createElement("button")
+        edit.classList.add("btn","btn-light","text-center","px-2","me-3")
+        const editImg = document.createElement("img")
+        editImg.src = "edit.svg"
+        editImg.alt = "edit"
+        edit.append(editImg)
+
+        //div
         const div = document.createElement("div")
         div.classList.add("me-3")
+        //div2
+        const div2 = document.createElement("div")
+        div2.classList.add("me-3")
+        //div3
+        const div3 = document.createElement("div")
+        // div3.classList.add("me-3","d-flex","justify-content-between")
         
         
-        
+        //eventListners
         checkbox.addEventListener("change", () => {
           task.completed = checkbox.checked
           checkbox.checked ? label.classList.add("text-decoration-line-through") : label.classList.remove("text-decoration-line-through")
-            saveTasks()
+          task.finishedAt = timeDateFormat.format(new Date())
+          checkbox.checked ?  finish.innerHTML = "Finish: "+ task.finishedAt : finish.innerHTML = ""
+            saveTasks(tasks)
         })
 
-        const itemId:string = task.id;
+        
         removeBtn.addEventListener("click",()=>{
             const newArray:Task[] = tasks.filter((item)=>{if(item.id!=itemId){return item}})
             tasks =[];
             tasks = newArray;
-            saveTasks();
+            saveTasks(tasks);
 
             if(list?.innerHTML==''|| list?.innerHTML == null) return
             list.innerHTML= "";
             tasks.forEach(addListItem)
         })
         
+        //apend
         checkbox.checked = task.completed
         checkbox.checked ? label.classList.add("text-decoration-line-through") : label.classList.remove("text-decoration-line-through")
+        checkbox.checked ?  finish.innerHTML = "Finish: "+ task.finishedAt  : finish.innerHTML = ""
         removeBtn.append("X")
+        div3.append(start,finish)
         label.append( `${task.title}`)
-        div.append(checkbox, label)
-        item.append(div,removeBtn)
+        div.append(checkbox, label,div3)
+        div2.append(edit,removeBtn)
+        item.append(div,div2)
         list?.append(item)
-    }
-
-    function saveTasks():void {
-        localStorage.setItem('Tasks',JSON.stringify(tasks))
-    }
-    function loadTasks():Task[]{
-        const taskJSON = localStorage.getItem('Tasks')
-        if(taskJSON == null) return []
-        return JSON.parse(taskJSON)
     }
 
 }
