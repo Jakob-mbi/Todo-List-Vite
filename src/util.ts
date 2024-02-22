@@ -15,7 +15,10 @@ function loadTasks():Task[]{
     return JSON.parse(taskJSON)
 }
 
+const timeDateFormat = new Intl.DateTimeFormat("sv",{
+    timeStyle: "short",
+    dateStyle: "short",
+})
 
 
-
-export {saveTasks,loadTasks,type Task}
+export {saveTasks,loadTasks,type Task,timeDateFormat}

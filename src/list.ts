@@ -1,5 +1,5 @@
 import { v4 as uuidV4 } from "uuid"
-import { saveTasks,type Task,loadTasks} from "./util";
+import { saveTasks,type Task,loadTasks,timeDateFormat} from "./util";
 
 
 export default function Items(){
@@ -11,12 +11,6 @@ export default function Items(){
     let tasks: Task[] = loadTasks()
     
     tasks.forEach(addListItem)
-
-     //timeDateFormat
-     const timeDateFormat = new Intl.DateTimeFormat("sv",{
-        timeStyle: "short",
-        dateStyle: "short",
-    })
 
     form?.addEventListener('submit', e => {
         e.preventDefault()
@@ -57,12 +51,10 @@ export default function Items(){
         label.classList.add("form-check-label","fs-2","text-capitalize")
         label.htmlFor="checkBox"
 
-        
-        //timeDateFormat
-        const timeDateFormat = new Intl.DateTimeFormat("sv",{
-            timeStyle: "short",
-            dateStyle: "short",
-        })
+        //update
+        const update = document.createElement("input")
+        update.classList.add("form-control","d-none","d-inline-block")
+        update.value=task.title
         
         // start
         const start = document.createElement("span")
@@ -87,6 +79,7 @@ export default function Items(){
         removeBtn.classList.add("btn", "btn-outline-danger","text-center","font-weight-bold","px-2");
 
         //edit
+        let isFirstImage = true;
         const edit = document.createElement("button")
         edit.classList.add("btn","btn-light","text-center","px-2","me-3")
         const editImg = document.createElement("img")
@@ -125,6 +118,23 @@ export default function Items(){
             list.innerHTML= "";
             tasks.forEach(addListItem)
         })
+
+        edit.addEventListener("click",()=>{
+            label.classList.toggle("d-none")
+            checkbox.classList.toggle("d-none")
+            update.classList.toggle("d-none")
+            if (isFirstImage) {
+                editImg.src = "save.svg";
+                isFirstImage=false;
+            } 
+            else {
+                editImg.src = "edit.svg";
+                isFirstImage=true;
+            }
+            task.title=update.value
+            saveTasks(tasks)
+            label.innerHTML=update.value
+        })
         
         //apend
         checkbox.checked = task.completed
@@ -133,7 +143,7 @@ export default function Items(){
         removeBtn.append("X")
         div3.append(start,finish)
         label.append( `${task.title}`)
-        div.append(checkbox, label,div3)
+        div.append(checkbox, label,update,div3)
         div2.append(edit,removeBtn)
         item.append(div,div2)
         list?.append(item)
