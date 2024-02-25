@@ -50,35 +50,35 @@ export default function Items(){
         const label = document.createElement("label")
         label.classList.add("form-check-label","fs-2","text-capitalize")
         label.htmlFor="checkBox"
-
-        //update
-        const update = document.createElement("input")
-        update.classList.add("form-control","d-none","d-inline-block")
-        update.value=task.title
         
-        // start
+        // task start time
         const start = document.createElement("span")
         start.classList.add("me-2","fs-6","flex-nowrap")
         const startTime = task.createdAt
         start.innerHTML = "Start: "+ startTime;
 
-        // finish
-
+        // task finish time 
         const finish = document.createElement("span")
-        finish.classList.add("fs-5","flex-nowrap")
+        finish.classList.add("fs-5","flex-nowrap","d-block")
 
         
-        //checkbox
+        //checkbox/toggle
         const checkbox = document.createElement("input")
         checkbox.classList.add("form-check-input","me-3","p-3")
         checkbox.id="checkBox"
         checkbox.type = "checkbox"
 
-        //removeBtn
+        //remove single task btn
         const removeBtn = document.createElement("button")
         removeBtn.classList.add("btn", "btn-outline-danger","text-center","font-weight-bold","px-2");
 
-        //edit
+        
+        //update/edit input
+        const update = document.createElement("input")
+        update.classList.add("form-control","d-none","d-inline-block")
+        update.value=task.title
+
+        //edit btn
         let isFirstImage = true;
         const edit = document.createElement("button")
         edit.classList.add("btn","btn-light","text-center","px-2","me-3")
@@ -133,10 +133,10 @@ export default function Items(){
             }
             task.title=update.value
             saveTasks(tasks)
-            label.innerHTML=update.value
+            label.innerText=update.value
         })
         
-        //apend
+        //append
         checkbox.checked = task.completed
         checkbox.checked ? label.classList.add("text-decoration-line-through") : label.classList.remove("text-decoration-line-through")
         checkbox.checked ?  finish.innerHTML = "Finish: "+ task.finishedAt  : finish.innerHTML = ""
